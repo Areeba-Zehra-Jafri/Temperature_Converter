@@ -4,15 +4,24 @@ import { useState } from "react";
 function Converter() {
     const [temp, setTemp] = useState('');
     const [result, setResult] = useState('');
+    const [history, setHistory] = useState([]);  
 
     const convertTemp = (mode) => {
         const value = parseFloat(temp);
+        let converted;
 
         if (mode === 'Celsius') {
-            setResult(((value - 32) * (5 / 9)));
+            converted = ((value - 32) * (5 / 9));
+            setResult(converted);
         } else {
-            setResult(((value * (9 / 5)) + 32));
+            converted = ((value * (9 / 5)) + 32);
+            setResult(converted);
         }
+
+        setHistory(prev => [
+            { from: value, to: converted, mode },
+            ...prev
+        ]);
     }
 
     return (
@@ -35,7 +44,23 @@ function Converter() {
                 </button>
             </div>
 
-            {result !== '' && <p>Result: {result}</p>}
+            {result !== '' && <p>Result: {result.toFixed(2)}</p>}
+
+            {history.length > 0 && (
+                <div className='history'>
+                    <h3>History</h3>
+                    <ul>
+                        {history.map((entry, index) => (
+                            <li key={index}>
+                                {entry.mode === 'Celsius'
+                                    ? `${entry.from}°F → ${entry.to.toFixed(2)}°C`
+                                    : `${entry.from}°C → ${entry.to.toFixed(2)}°F`
+                                }
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }
